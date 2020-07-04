@@ -50,10 +50,11 @@ defmodule Line do
   end
 
   defp parse(raw, matches) do
-    args = case matches["long_arg"] do
-      "" -> split_args(matches["args"])
-      long_arg -> split_args(matches["args"]) ++ [strip_first(long_arg)]
-    end
+    args =
+      case matches["long_arg"] do
+        "" -> split_args(matches["args"])
+        long_arg -> split_args(matches["args"]) ++ [strip_first(long_arg)]
+      end
 
     %Line{
       sender: presence(strip_first(matches["sender"])),
@@ -63,7 +64,10 @@ defmodule Line do
     }
   end
 
-  defp strip_first("") do "" end
+  defp strip_first("") do
+    ""
+  end
+
   defp strip_first(str) do
     String.slice(str, 1, String.length(str) - 1)
   end
@@ -72,6 +76,11 @@ defmodule Line do
     String.split(args, ~r/[[:space:]]/, trim: true)
   end
 
-  defp presence("") do nil end
-  defp presence(str) do str end
+  defp presence("") do
+    nil
+  end
+
+  defp presence(str) do
+    str
+  end
 end
