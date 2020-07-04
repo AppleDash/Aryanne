@@ -4,35 +4,32 @@ defmodule IrcBot.IrcBot do
   alias IrcBot.Derpibooru
   alias IrcBot.Irc.MessageContext
 
-  def init(:ok) do
-    {:ok, %{socket: Socket.TCP.connect!("irc.canternet.org", 6667, packet: :line, mode: :active)}}
+  def init({:ok, config}) do
+    socket = Socket.TCP.connect!(config.host, config.port, packet: :line, mode: :active)
+
+    puts!(socket, "NICK " <> config.nick)
+    puts!(socket, "USER " <> config.nick <> " * * :" <> config.nick)
+
+    {:ok, %{socket: socket}}
   end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  def start_link(config) do
+    GenServer.start_link(__MODULE__, config)
   end
 
   @impl true
   def handle_info(msg, %{socket: socket} = state) do
-    with {:tcp, ^socket, message} <- msg do
-      process_line(socket, Line.parse!(message))
+    with {:tcp, ^socket, data} <- msg do
+      process_line(socket, Line.parse!(data))
     end
 
     {:noreply, state}
   end
 
-  def start() do
-    sock = Socket.TCP.connect!("irc.canternet.org", 6667, packet: :line, mode: :active)
-
-    puts!(sock, "NICK Aryanne")
-    puts!(sock, "USER Aryanne * * :Aryanne")
-
-    loop(sock)
-  end
-
   defp handle_command(socket, context, [cmd | args]) do
     case cmd do
       "ping" -> privmsg(socket, MessageContext.reply_target(context), "Pong!")
+      "crash" -> exit(1)
       _ -> nil
     end
   end
@@ -87,13 +84,5 @@ defmodule IrcBot.IrcBot do
     IO.puts("<-- " <> data)
 
     Socket.Stream.send!(socket, data <> "\r\n")
-  end
-
-  defp loop(socket) do
-    receive do
-      {:tcp, ^socket, message} -> process_line(socket, Line.parse!(message))
-    end
-
-    loop(socket)
   end
 end

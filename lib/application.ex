@@ -1,8 +1,7 @@
 defmodule IrcBot.Application do
-	use Application
+    use Application
 
-	def start(_type, _args) do
-		IO.puts "Hi"
-		IrcBot.Supervisor.start_link(%{})
-	end
+    def start(_type, _args) do
+      IrcBot.Supervisor.start_link(%{host: "irc.canternet.org", port: 6667, nick: "Aryanne"})
+    end
 end
