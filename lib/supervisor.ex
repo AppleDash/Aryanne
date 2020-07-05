@@ -6,9 +6,10 @@ defmodule IrcBot.Supervisor do
   end
 
   @impl true
-  def init(arg) do
+  def init(config) do
     children = [
-      {IrcBot.IrcBot, arg}
+      {IrcBot.CommandHandler, name: CommandHandler},
+      {IrcBot.IrcBot, config}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

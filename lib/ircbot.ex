@@ -27,10 +27,11 @@ defmodule IrcBot.IrcBot do
   end
 
   defp handle_command(socket, context, [cmd | args]) do
-    case cmd do
-      "ping" -> privmsg(socket, MessageContext.reply_target(context), "Pong!")
-      "crash" -> exit(1)
-      _ -> nil
+    cmd_ctx = %IrcBot.CommandContext{command: cmd, args: args}
+
+    case IrcBot.CommandHandler.handle_command(CommandHandler, cmd_ctx) do
+      {:respond, response} -> privmsg(socket, MessageContext.reply_target(context), response)
+      {:nothing} -> nil
     end
   end
 
@@ -45,7 +46,7 @@ defmodule IrcBot.IrcBot do
           "Sieg heil! https://derpibooru.org/images/" <> Integer.to_string(image["id"])
         )
 
-      {:error, _} ->
+      err ->
         privmsg(socket, reply_to, ":(")
     end
   end
