@@ -1,9 +1,11 @@
 defmodule IrcBot.IrcBot do
   use GenServer
 
-  alias IrcBot.Derpibooru
   alias IrcBot.Irc.MessageContext
+  alias IrcBot.Command.CommandHandler
+  alias IrcBot.Command.CommandContext
 
+  @impl true
   def init({:ok, config}) do
     socket = Socket.TCP.connect!(config.host, config.port, packet: :line, mode: :active)
 
@@ -27,29 +29,12 @@ defmodule IrcBot.IrcBot do
   end
 
   defp handle_command(socket, context, [cmd | args]) do
-    cmd_ctx = %IrcBot.CommandContext{command: cmd, args: args}
-
-    case IrcBot.CommandHandler.handle_command(CommandHandler, cmd_ctx) do
+    case CommandHandler.handle_command(:command_handler, %CommandContext{command: cmd, args: args}) do
       {:respond, response} -> privmsg(socket, MessageContext.reply_target(context), response)
       {:nothing} -> nil
     end
   end
 
-  defp handle_heil(socket, context) do
-    reply_to = MessageContext.reply_target(context)
-
-    case Derpibooru.random_image("sieg heil") do
-      {:ok, image} ->
-        privmsg(
-          socket,
-          reply_to,
-          "Sieg heil! https://derpibooru.org/images/" <> Integer.to_string(image["id"])
-        )
-
-      err ->
-        privmsg(socket, reply_to, ":(")
-    end
-  end
 
   defp handle_privmsg(socket, line) do
     [target, message] = line.params
@@ -58,10 +43,8 @@ defmodule IrcBot.IrcBot do
 
     IO.puts("[" <> target <> "] <" <> line.sender <> "> " <> message)
 
-    case message do
-      "!" <> remainder -> handle_command(socket, context, String.split(remainder))
-      "heil" -> handle_heil(socket, context)
-      _ -> nil
+    with "!" <> remainder <- message do
+      handle_command(socket, context, String.split(remainder))
     end
   end
 

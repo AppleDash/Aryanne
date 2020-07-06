@@ -8,7 +8,7 @@ defmodule IrcBot.Supervisor do
   @impl true
   def init(config) do
     children = [
-      {IrcBot.CommandHandler, name: CommandHandler},
+      {IrcBot.Command.CommandHandler, name: :command_handler},
       {IrcBot.IrcBot, config}
     ]
 
