@@ -1,13 +1,13 @@
 defmodule IrcBot.Application do
-    use Application
+  use Application
 
-    def start(_type, _args) do
-      IrcBot.Supervisor.start_link(%{host: "irc.canternet.org", port: 6667, nick: "Aryanne"})
+  def start(_type, _args) do
+    IrcBot.Supervisor.start_link(%{host: "irc.canternet.org", port: 6667, nick: "Aryanne"})
 
-      loop()
-    end
+    loop()
+  end
 
-    def loop() do
-      loop()
-    end
+  def loop() do
+    loop()
+  end
 end

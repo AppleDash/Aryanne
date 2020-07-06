@@ -35,7 +35,6 @@ defmodule IrcBot.IrcBot do
     end
   end
 
-
   defp handle_privmsg(socket, line) do
     [target, message] = line.params
 

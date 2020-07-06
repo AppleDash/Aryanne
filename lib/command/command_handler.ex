@@ -22,11 +22,12 @@ defmodule IrcBot.Command.CommandHandler do
 
   @impl true
   def handle_call({:command, context}, _from, state) do
-    {:reply, case context do
-        %{command: "ping"} -> {:respond, "Pong!"}
-        %{command: "heil"} -> handle_heil()
-        _ -> {:nothing}
-    end, state}
+    {:reply,
+     case context do
+       %{command: "ping"} -> {:respond, "Pong!"}
+       %{command: "heil"} -> handle_heil()
+       _ -> {:nothing}
+     end, state}
   end
 
   # handler for !heil

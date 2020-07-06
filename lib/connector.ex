@@ -6,7 +6,7 @@ defmodule IrcBot.Connector do
 
   def init({:ok, config}) do
     socket = Socket.TCP.connect!(config.host, config.port, packet: :line, mode: :active)
-    
+
     {:ok, %{socket: socket}}
   end
 
